@@ -1,7 +1,9 @@
-/** @file Pals2.cpp
- *  @brief Arduino library to control the proximity and ambient light sensor PALS2 from Infineon (packaged by Vishay as VCNL4135X01)
- *	@author Yuxi Sun
- *
+/**
+ * @file Pals2.cpp
+ * @brief Arduino library to control the proximity and ambient light sensor PALS2 from Infineon (packaged by Vishay as VCNL4135X01)
+ * @author Yuxi Sun
+ * @bug no Blue-PD value updates -> getIlluminance() not working;
+ * @bug	in register 83h sensor measurement freezes if IRED output is not default(0): due to circuitry?
  */
 
 #include "Pals2.h"
@@ -12,6 +14,8 @@ Pals2::Pals2() {
 
 void Pals2::begin(void) {
 	Wire.begin();
+	//reset sensor
+	resetSensor();
 	//enables periodic measurement (stand-by)
 	enablePeriodicMeasurements();
 }
@@ -41,8 +45,6 @@ void Pals2::updateData(void) {
 	}
 }
 
-/* @return illuminance value in Lux as matched to human eye perception
- */
 float Pals2::getIlluminance(void) {
 	return rawAmbientLight / 100; //according to Fig. 9, how to make of the formulas on Page 6?
 }
@@ -53,6 +55,14 @@ uint16_t Pals2::getRawProximity(void) {
 
 uint16_t Pals2::getRawAmbientLight(void) {
 	return rawAmbientLight;
+}
+
+void Pals2::resetSensor(void) {
+	writeOut(PROXIMITY_CONFIG, 0x00);
+	writeOut(IRED_CONFIG, 0x00);
+	writeOut(ALS_CONFIG, 0x00);
+	writeOut(ALS_COMPENSATION, 0x00);
+	writeOut(INTERRUPT_CONFIG, 0x00);
 }
 
 void Pals2::enablePeriodicMeasurements(void) {
@@ -70,14 +80,13 @@ void Pals2::disableProximityOffsetCompensation(void) {
 }
 
 void Pals2::setProximityMeasurementRate(uint16_t rate) {
-	uint16_t tempRate = rate;
 	if (rate > 256)
-		tempRate = 256;
+		rate = 256;
 	//clear the bits for measurement rate
 	proximityConfig &= ~0x07;
 	//prx_rate = ld(rate) - 1
 	uint8_t prx_rate = -1;
-	while (tempRate >>= 1)
+	while (rate >>= 1)
 		prx_rate++;
 	proximityConfig |= prx_rate;
 	writeOut(PROXIMITY_CONFIG, proximityConfig);
@@ -133,7 +142,6 @@ void Pals2::disableAmbientLightInterrupt(void) {
 }
 
 void Pals2::enableColorCompensation(bool colorCompPeriod) {
-	//by default (colorCompPeriod = 0) the faster measurement cycle is chosen (0ms to 10ms)
 	writeOut(ALS_COMPENSATION, 0x01 + 0x02 * colorCompPeriod);
 	colorCompensationEnabled = true;
 }
@@ -151,6 +159,7 @@ uint16_t Pals2::concatResults(uint8_t upperByte, uint8_t lowerByte) {
 }
 
 void Pals2::setADCGain(uint16_t adcGain) {
+	//clears bits 3,4
 	ambientLightConfig &= ~(0x03 << 3);
 	//default ADC gain is 200 fA (bits 3, 4 = 0)
 	switch (adcGain) {
@@ -224,7 +233,8 @@ void Pals2::enableOnDemandReading(void) {
 		Wire.endTransmission();
 
 		//set time out in case sensor gets stuck
-		if(millis()-start>1000) break;
+		if (millis() - start > 1000)
+			break;
 	}
 }
 

@@ -1,13 +1,28 @@
 /**
- *  @page The Arduino Library for the proximity and ambient light sensor VCNL4531X01
- *  @section 
+ * @page The Arduino Library for the proximity and ambient light sensor PALS-2
+ * @section introduction Introduction
+ * The infineon PALS-2 (packaged by Vishay as VCNL4135X01) is a proximity and ambient light
+ * sensor. It offers proximity and ambient light readings with 16-bit resolution. I2C protocol
+ * is used to communicate with the host microcontroller. It can be used for gesture recognition,
+ * touch screen locking and dimming of displays.
+ *
+ * For the proximity function there are a built-in IRED driver and photo-pin-diode. LED driver
+ * current can be programmed and up to 3 external IREDs can be connected. Offset compensation can be
+ * enabled for the proximity measurement; with this feature the sensor writes the difference between
+ * the normal proximity value and the estimated offset into the corresponding register.
+ *
+ * For the ambient light function there a one photo-pin-diode. Two additional photodiodes can receive
+ * light in the blue area.
+ *
+ * Other features include: readouts either periodically or on-demand; interrupts for both functions, with
+ * adjustable lower/upper thresholds and persistence.
  */
 
 #ifndef PALS2_H_INCLUDED
 #define PALS2_H_INCLUDED
 
-#define PALS2_NUM_REG 		27
-#define PALS2_REG_SIZE		1
+#define PALS2_NUM_REG 			27
+#define PALS2_REG_SIZE			1
 #define SLAVE_ADDRESS 			0x13
 #define NUM_MEASUREMENTS		4
 #define NUM_MEASUREMENTS_BLUE	10
@@ -42,52 +57,133 @@
 class Pals2 {
 public:
 	Pals2();
+
+	/**
+	 * @brief Starts the sensor.
+	 */
 	void begin(void);
+
+	/**
+	 * @brief Enables periodic measurements of proximity and ambient light values.
+	 */
+	void enablePeriodicMeasurements(void);
+
+	/**
+	 * @brief Updates measurement data. Needed to be called in each measurement cycle.
+	 */
 	void updateData(void);
+
+	/**
+	 * @brief Gets sensor measurement updates. Should be called after \ref updateData(void) updateData().
+	 * @return raw proximity value as an integer from 0 to 65536.
+	 */
 	uint16_t getRawProximity(void);
+
+	/**
+	 * @brief Gets sensor measurement updates. Should be called after \ref updateData(void) updateData()
+	 * @return raw ambient light value as an integer from 0 to 65536.
+	 */
 	uint16_t getRawAmbientLight(void);
+
+	/**
+	 * @return a single raw proximity value measured on demand.
+	 */
 	uint16_t getRawProximityOnDemand(void);
+
+	/**
+	 * @return a single raw ambient light value measured on demand.
+	 */
 	uint16_t getRawAmbientLightOnDemand(void);
+
+	/**
+	 * @return the illuminance value computed from ALS and blue photodiode values.
+	 */
 	float getIlluminance(void);
 
-	//If prox offset compensation is enabled the proximity measurement result register contain just the difference between total measured counts
-	//and measured offset value. With this enabled prox offset always 2 measurements are carried out when starting either on demand or self-timed proximity measurements
+	/**
+	 * @brief Enables proximity offset compensation. The raw proximity values read will be the difference between the actual measured value and the estimated offset value,
+	 * 		  thus 2 measurements are taken in each cycle. Works for both periodic and on-demand measurement.
+	 */
 	void enableProximityOffsetCompensation(void);
-	void disableProximityOffsetCompensation(void);
-	void setProximityMeasurementRate(uint16_t);
 
+	/**
+	 * @brief Disables proximity offset compensation.
+	 */
+	void disableProximityOffsetCompensation(void);
+
+	/**
+	 * @brief Sets the measurement rate of proximity measurement.
+	 * @param rate Number of measurements per second. Can be one of the numbers from [2, 4, 8, 16, 32, 64, 128, 256].
+	 */
+	void setProximityMeasurementRate(uint16_t rate);
+
+	/**
+	 * @brief Sets the number of consecutive measurements needed above/below the threshold for an interrupt to be generated.
+	 * @param persistence Number of valid measurements needed, which is one of the numbers from [1, 2, 4, 8, 16, 32, 64, 128].
+	 */
 	void setInterruptPersistence(uint8_t persistence);
-	void enableProximityInterrupt(uint16_t topThreshold, uint16_t bottomThreshold);
+
+	/**
+	 * @brief Enables interrupts for proximity measurement and sets the lower/upper thresholds.
+	 * @param topThreshold Upper threshold. By default 65536
+	 * @param bottomThreshold Lower threshold. By default 0
+	 */
+	void enableProximityInterrupt(uint16_t topThreshold = 0xFF,
+			uint16_t bottomThreshold = 0x00);
+
+	/**
+	 * @brief Disables interrupts for proximity measurement.
+	 */
 	void disableProximityInterrupt(void);
 
-	void enableAmbientLightInterrupt(uint16_t topThreshold, uint16_t bottomThreshold);
+	/**
+	 * @brief Enables interrupts for ambient light measurement and sets the lower/upper thresholds.
+	 * @param topThreshold Upper threshold. By default 65536
+	 * @param bottomThreshold Lower threshold. By default 0
+	 */
+	void enableAmbientLightInterrupt(uint16_t topThreshold = 0xFF,
+			uint16_t bottomThreshold = 0x00);
+
+	/**
+	 * @brief Disables interrupts for ambient light measurement.
+	 */
 	void disableAmbientLightInterrupt(void);
 
-	//for light sources with high intensity reading of blue PD should be enabled. Blue photodiode measurement enable.
-	//0: 0-10 ms; 1:1-100ms
+	/**
+	 * @brief For light sources with high intensity color compensation should be enabled (additional reading of blue PD will be conducted).
+	 * @param colorCompPeriod The period of color compensation measurement; 0 for a shorter period (0 to 10ms) and 1 for a longer period (10 to 100ms)
+	 */
 	void enableColorCompensation(bool colorCompPeriod = 0);
-	//adc gain: 0-3: 200, 800, 3200, 25600 fA
-	//alsRate 0-7: 1-8 measurements/s
+
+	/**
+	 * @brief Sets the ADC gain, which affects the calculation of illuminance. A higher ADC gain leads to a higher illuminance value.
+	 * @param adcGain ADC gain in fA, can be 200/800/3200/25600; for any other value the default (200 fA) is taken
+	 */
 	void setADCGain(uint16_t adcGain);
+
+	/**
+	 * @brief Sets the rate of ambient light measurement.
+	 * @alsRate Number of measurements per second, which is an integer from 1 to 8
+	 */
 	void setAmbientLightMeasurementRate(uint8_t alsRate);
+
 	//TODO: set IRED (register #3)
-	uint8_t proximityConfig = 0;
+
+	void resetSensor(void);
 private:
 	bool colorCompensationEnabled = false;
-
+	uint8_t proximityConfig = 0;
 	uint8_t ambientLightConfig = 0;
 	uint8_t interruptConfig = 0;
-	float gainFactor;
-	uint16_t rawProximity;
-	uint16_t rawAmbientLight;
-
+	float gainFactor = 81.79;
+	uint16_t rawProximity = 0;
+	uint16_t rawAmbientLight = 0;
 	float getBlueRatio(void);
-	uint16_t blue1PD;
-	uint16_t blue2PD;
+	uint16_t blue1PD = 0;
+	uint16_t blue2PD = 0;
 	uint16_t concatResults(uint8_t upperByte, uint8_t lowerByte);
 	void writeOut(uint16_t regNum, uint16_t val);
 	void enableOnDemandReading(void);
-	void enablePeriodicMeasurements(void);
 };
 
 #endif		/* PALS2_H_INCLUDED */
