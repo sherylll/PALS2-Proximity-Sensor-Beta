@@ -1,0 +1,40 @@
+#######################################
+# Syntax Coloring Map For Pals-2
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+Pals2				KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin							KEYWORD2
+end								KEYWORD2
+updateData						KEYWORD2
+getRawProximity					KEYWORD2
+getRawAmbientLight				KEYWORD2
+getRawProximityOnDemand			KEYWORD2
+getRawAmbientLightOnDemand		KEYWORD2
+getIlluminance					KEYWORD2
+
+enableProximityOffsetCompensation	KEYWORD2
+disableProximityOffsetCompensation	KEYWORD2
+setProximityMeasurementRate			KEYWORD2
+setInterruptPersistence				KEYWORD2
+enableProximityInterrupt			KEYWORD2
+disableProximityInterrupt			KEYWORD2
+enableAmbientLightInterrupt			KEYWORD2
+disableAmbientLightInterrupt		KEYWORD2
+enableColorCompensation				KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+SLAVE_ADDRESS		LITERAL1
+COMMAND_REGISTER	LITERAL1
+PALS2_NUM_REG		LITERAL1
+PALS2_REG_SIZE		LITERAL1
