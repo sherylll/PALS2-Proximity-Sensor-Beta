@@ -3,7 +3,8 @@
  * @brief Arduino library to control the proximity and ambient light sensor PALS2 from Infineon (packaged by Vishay as VCNL4135X01)
  * @author Yuxi Sun
  * @bug no Blue-PD value updates -> getIlluminance() not working;
- * @bug	in register 83h sensor measurement freezes if IRED output is not default(0): due to circuitry?
+ * @bug update very slow (1 measurement/s) when periodic measurement is enabled, changing measurement rates in config register has no effect
+ * @bug	in register 83h sensor measurement freezes if IRED output is not default(0): due to missing IREDs?
  */
 
 #include "Pals2.h"
@@ -21,28 +22,45 @@ void Pals2::begin(void) {
 }
 
 void Pals2::updateData(void) {
-	uint16_t measurements[NUM_MEASUREMENTS_BLUE];
-	Wire.beginTransmission(SLAVE_ADDRESS);
-	uint8_t i = 0;
-	//Measurement values start at 0x86
-	if (!colorCompensationEnabled)
-		Wire.requestFrom(SLAVE_ADDRESS, NUM_MEASUREMENTS, PROXIMITY_HIGH_BYTE,
-		PALS2_REG_SIZE, 0);
-	else
-		Wire.requestFrom(SLAVE_ADDRESS, NUM_MEASUREMENTS_BLUE,
-		PROXIMITY_HIGH_BYTE, PALS2_REG_SIZE, 0);
-	while (Wire.available()) {
-		measurements[i] = Wire.read();
-		i++;
-	}
+	uint8_t highByte = 0, lowByte = 0;
+
+	Wire.requestFrom(SLAVE_ADDRESS, 1, COMMAND_REGISTER,
+	PALS2_REG_SIZE, 0);
+	uint8_t result = Wire.read();
 	Wire.endTransmission();
 
-	rawProximity = concatResults(measurements[0], measurements[1]);
-	rawAmbientLight = concatResults(measurements[2], measurements[3]);
-	if (colorCompensationEnabled) {
-		blue1PD = concatResults(measurements[6], measurements[7]);
-		blue2PD = concatResults(measurements[8], measurements[9]);
+	//ready bits
+	bool als_ready = (result & 0x40) >> 6;
+	bool prox_ready = (result & 0x20) >> 5;
+	if ((!als_ready) && (!prox_ready))
+		return;
+
+	if (prox_ready) {
+		Wire.requestFrom(SLAVE_ADDRESS, 2, PROXIMITY_HIGH_BYTE,
+		PALS2_REG_SIZE, 0);
+		highByte = Wire.read();
+		lowByte = Wire.read();
+		rawProximity = concatResults(highByte, lowByte);
 	}
+	if (als_ready) {
+		Wire.requestFrom(SLAVE_ADDRESS, 2, ALS_HIGH_BYTE,
+		PALS2_REG_SIZE, 0);
+		highByte = Wire.read();
+		lowByte = Wire.read();
+		rawAmbientLight = concatResults(highByte, lowByte);
+	}
+	if (colorCompensationEnabled) {
+		Wire.requestFrom(SLAVE_ADDRESS, 4,
+		BLUE1_HIGH_BYTE, PALS2_REG_SIZE, 0);
+		highByte = Wire.read();
+		lowByte = Wire.read();
+		blue1PD = concatResults(highByte, lowByte);
+		highByte = Wire.read();
+		lowByte = Wire.read();
+		blue2PD = concatResults(highByte, lowByte);
+	}
+
+	Wire.endTransmission();
 }
 
 float Pals2::getIlluminance(void) {

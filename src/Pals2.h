@@ -24,8 +24,6 @@
 #define PALS2_NUM_REG 			27
 #define PALS2_REG_SIZE			1
 #define SLAVE_ADDRESS 			0x13
-#define NUM_MEASUREMENTS		4
-#define NUM_MEASUREMENTS_BLUE	10
 
 #define COMMAND_REGISTER		0x80
 #define PROXIMITY_CONFIG		0x82
@@ -86,6 +84,7 @@ public:
 	uint16_t getRawAmbientLight(void);
 
 	/**
+	 * @brief Enables on-demand measurement of raw proximity values. Busy waiting is used for the values to be ready.
 	 * @return a single raw proximity value measured on demand.
 	 */
 	uint16_t getRawProximityOnDemand(void);
