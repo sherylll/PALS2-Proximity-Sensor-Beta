@@ -1,7 +1,7 @@
 /**
  * @page The Arduino Library for the proximity and ambient light sensor PALS-2
  * @section introduction Introduction
- * The infineon PALS-2 (packaged by Vishay as VCNL4135X01) is a proximity and ambient light
+ * The Infineon PALS-2 (packaged by Vishay as VCNL4135X01) is a proximity and ambient light
  * sensor. It offers proximity and ambient light readings with 16-bit resolution. I2C protocol
  * is used to communicate with the host microcontroller. It can be used for gesture recognition,
  * touch screen locking and dimming of displays.

@@ -1,6 +1,8 @@
 /**
  * This example works with the Arduino example pong for the PALS-2 sensor
  * It is modified from this sketch: https://www.openprocessing.org/sketch/47481
+ * You can run this example with Processing (https://processing.org/download/), while the microcontroller
+ * is already flashed with pong.ino
  */
 
 import processing.serial.*;

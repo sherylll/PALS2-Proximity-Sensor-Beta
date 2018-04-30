@@ -1,5 +1,4 @@
 
-
 #include <Pals2.h>
 Pals2 pals;
 void setup() {
