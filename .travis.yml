@@ -29,7 +29,7 @@ env:
         # TODO: change to "Infineon"
         - PRIVATE_NAME=sherylll
         - USR_EMAIL="Yuxi.Sun@infineon.com"
-        - secure: 1SbBRVOZZSul8qllkZIkW6kNByLpINA6AaicQed7xu/rdjmZo1fiBk5s1gkrcS2xZr3+a2TBNba1Fp/qQEnHgDyuXj5rxtjM0VCD7wdCrhl+y9iKtYaznTPr/jAo6AU7GS4nIV4Yessn83owr2WFLSugss611RbzMW0rhQFzbiv7cFbOxX2pvytmN0PdHllAa4etjOB/HlIq0AVGQAS4dCgcvErdE90MZtg04eq+gvNxZgrbxkfm/RUEiRFDfdYdVxcOMo7DdiNWYt0r1TV+2whHbfNrTWlGSleZwtUDiYHwBOrDcah2CgQ8wYyDGLWUQrbmZ5MNt143gGzXhJsrP73pIxTkKIyvaeXX9br/M1SeUoW/jqSE8X5l8rbkOQHOF5PCDr8Tzkio18O3K9RW5Zn8VA9iZdizkI1QF/jfIWwIk8VbJjbNsLZijObDWzkezgtpyWPteK28lw/8l6XP0Tf+nOgT/CrkjppJcwTU8QQuMbYpeBq+BGYLp1fymG59iKKQNbckt/AzeYxoKDw0vtiuLZgDuxD9SO5QEbXr5lxQi3tO6arrlDhrxH+E5AO/0NdgdYorc5m3EYmHhMQI1He4SoceIN0F4+9EMzDbTEDZmP2pfj9i18aV+m5iFDls7r66tWYSchzUeEibBIrVLhJOgO3zXen9F928fb8YBuo=
+        - secure: IfRlWFhvPv7sdpNV9fOWyNBec6n/FsvTONc4SD+xyaDYUTCdCCsSNRu87vsoMmvb/stVJtOGfsqoOqb087pMCNJ7Lhes7qFobGOFwLy1gyYQtCTDYoKReWOtqreBqD+pdRs7ztozYJKOwnYCySet2wgH3s6ovwLhZd8TcydRjvUjQRRsSf0BcALTASEjhLzOU+TQj7Ak7exeSfzafhICeZCvYMhCekeNKfGdDd0P4B8VLEdvLGvXKfegLvm/+O1FGvohztcEANYzAAR98zQfRVXw0jY4zXA1mFEH8nLQTIYBrvSO/YSaTWJRcfJtVvOnShcb/T+mJqiKoVvsu/T5NadmATbqjSL/9xHdQJbLu8WRnCUeRQC40lrFSfCm76OtuGdpZkiPaVHGMft1QyABjuvWLaIe0XThfYBjlSEN8MMSlp08PbbV+dW7Oj3thm3yB+MYEvcVVc30vIp+zMd6GDHEhR6KiRLwJ+eU6tGWlbydIq/s9JmIi+oiRXVVfMK6Ylz5gqq2pw3rODoey3/I+7veW6YY2MrgAYq1KaEeXqpBJLfb9D5GTVI5pgk2aRFunuPdxX9UuT1SfOs1RfEo3MXk5uyP38aENvYCoFHZ6hxi60NA+kFINTn6ej0RdaUe0418og0XwDIwztiFIW9Sj2kKpi943L+mAAksImm+tqs=
     matrix:
         - PLATFORMIO_CI_SRC=examples/pong 
         - PLATFORMIO_CI_SRC=examples/print_raw_data 
