@@ -24,13 +24,12 @@ before_script:
 
 env:
     global:
-        - REPO_NAME=PALS2-PROXIMITY-SENSOR
         - USR_NAME="Sun Yuxi (IFAG DES SDF FW)"
-        # TODO: change to "Infineon"
-        - PRIVATE_NAME=sherylll
         - USR_EMAIL="Yuxi.Sun@infineon.com"
+        ####generate new token for each repo####
         - secure: IfRlWFhvPv7sdpNV9fOWyNBec6n/FsvTONc4SD+xyaDYUTCdCCsSNRu87vsoMmvb/stVJtOGfsqoOqb087pMCNJ7Lhes7qFobGOFwLy1gyYQtCTDYoKReWOtqreBqD+pdRs7ztozYJKOwnYCySet2wgH3s6ovwLhZd8TcydRjvUjQRRsSf0BcALTASEjhLzOU+TQj7Ak7exeSfzafhICeZCvYMhCekeNKfGdDd0P4B8VLEdvLGvXKfegLvm/+O1FGvohztcEANYzAAR98zQfRVXw0jY4zXA1mFEH8nLQTIYBrvSO/YSaTWJRcfJtVvOnShcb/T+mJqiKoVvsu/T5NadmATbqjSL/9xHdQJbLu8WRnCUeRQC40lrFSfCm76OtuGdpZkiPaVHGMft1QyABjuvWLaIe0XThfYBjlSEN8MMSlp08PbbV+dW7Oj3thm3yB+MYEvcVVc30vIp+zMd6GDHEhR6KiRLwJ+eU6tGWlbydIq/s9JmIi+oiRXVVfMK6Ylz5gqq2pw3rODoey3/I+7veW6YY2MrgAYq1KaEeXqpBJLfb9D5GTVI5pgk2aRFunuPdxX9UuT1SfOs1RfEo3MXk5uyP38aENvYCoFHZ6hxi60NA+kFINTn6ej0RdaUe0418og0XwDIwztiFIW9Sj2kKpi943L+mAAksImm+tqs=
     matrix:
+        ##########change example paths##########
         - PLATFORMIO_CI_SRC=examples/pong 
         - PLATFORMIO_CI_SRC=examples/print_raw_data 
 
@@ -38,7 +37,7 @@ install:
     ## build with stable core
     # - git clone https://github.com/Infineon/platformio-infineonxmc.git /tmp/builder
     # - pip install -U platformio
-    # - platformio platform install -f file:///tmp/builder/. --without-package=uploader
+    # - platformio platform install -f file:///tmp/builder/.
 
     # build with development version
     - git clone https://github.com/Infineon/XMC-for-Arduino.git /tmp/core
@@ -49,7 +48,7 @@ install:
     - rm platform.json
     - jq '.packages."framework-arduinoxmc".version = "file:///tmp/core/framework-arduinoxmc.zip"' <<<"$platform_json" > platform.json
     - pip install -U platformio
-    - platformio platform install -f file://. --without-package=uploader
+    - platformio platform install -f file://. 
     - cd -
 script:
     - platformio ci --lib="." --board=xmc1100_xmc2go --board=xmc1100_boot_kit --board=xmc1100_h_bridge2go --board=xmc1300_boot_kit --board=xmc4700_relax_kit
@@ -58,6 +57,7 @@ after_success:
     # only build once (after one job by checking id, however this does not work reliably)
     - |
       if [ $(($TRAVIS_JOB_ID - $TRAVIS_BUILD_ID)) -eq 2 ]; then
+        export REPO_NAME=${TRAVIS_REPO_SLUG#*/}
         git clone https://github.com/Infineon/well-automated-documentation.git
         cd well-automated-documentation/docs
         # cd $TRAVIS_BUILD_DIR/docs
