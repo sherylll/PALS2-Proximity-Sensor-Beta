@@ -8,11 +8,6 @@ branches:
   only:
     - master
 
-before_script:
-  - wget https://github.com/Infineon/Assets/releases/download/current/gcc-arm-none-eabi-5_4-2016q3-20160926-linux.-d-.tar.bz2 -O /tmp/gcc-arm-none-eabi.tar.bz2
-  - tar -xjf /tmp/gcc-arm-none-eabi.tar.bz2
-  - export PATH=$PATH:$PWD/gcc-arm-none-eabi-5_4-2016q3/bin/
-
 env:
     global:
         - USR_NAME="Sun Yuxi (IFAG DES SDF FW)"
