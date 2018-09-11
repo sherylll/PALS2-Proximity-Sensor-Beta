@@ -24,16 +24,11 @@ env:
         - PLATFORMIO_CI_SRC=examples/pong 
         - PLATFORMIO_CI_SRC=examples/print_raw_data 
         
-        - FOO=foo
-        - FOO=bar
-
 install:
     # build with stable core
     - pip install -U platformio
     - platformio platform install -f infineonxmc
 script:
-    # testing
-    - echo $FOO 
     - platformio ci --lib="." --board=xmc1100_xmc2go --board=xmc1100_boot_kit --board=xmc1100_h_bridge2go --board=xmc1300_boot_kit --board=xmc4700_relax_kit
  
 after_success:
