@@ -3,20 +3,11 @@ python:
     - "2.7"
 
 sudo: required
-cache:
-    directories:
-        - "~/.platformio"
         
 branches:
   only:
     - master
-    
-addons:
-  apt_packages:
-    - lib32bz2-1.0
-    - lib32ncurses5
-    - lib32z1
-    
+
 before_script:
   - wget https://github.com/Infineon/Assets/releases/download/current/gcc-arm-none-eabi-5_4-2016q3-20160926-linux.-d-.tar.bz2 -O /tmp/gcc-arm-none-eabi.tar.bz2
   - tar -xjf /tmp/gcc-arm-none-eabi.tar.bz2
@@ -32,25 +23,17 @@ env:
         ##########change example paths##########
         - PLATFORMIO_CI_SRC=examples/pong 
         - PLATFORMIO_CI_SRC=examples/print_raw_data 
+        
+        - FOO=foo
+        - FOO=bar
 
 install:
-    ## build with stable core
-    # - git clone https://github.com/Infineon/platformio-infineonxmc.git /tmp/builder
-    # - pip install -U platformio
-    # - platformio platform install -f file:///tmp/builder/.
-
-    # build with development version
-    - git clone https://github.com/Infineon/XMC-for-Arduino.git /tmp/core
-    - zip -r /tmp/core/framework-arduinoxmc.zip /tmp/core/arm  
-    - git clone https://github.com/Infineon/platformio-infineonxmc.git /tmp/builder
-    - cd /tmp/builder
-    - platform_json=$(<platform.json)
-    - rm platform.json
-    - jq '.packages."framework-arduinoxmc".version = "file:///tmp/core/framework-arduinoxmc.zip"' <<<"$platform_json" > platform.json
+    # build with stable core
     - pip install -U platformio
-    - platformio platform install -f file://. 
-    - cd -
+    - platformio platform install -f infineonxmc
 script:
+    # testing
+    - echo $FOO 
     - platformio ci --lib="." --board=xmc1100_xmc2go --board=xmc1100_boot_kit --board=xmc1100_h_bridge2go --board=xmc1300_boot_kit --board=xmc4700_relax_kit
  
 after_success:
